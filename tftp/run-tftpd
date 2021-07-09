@@ -2,7 +2,14 @@
 set -euo pipefail
 
 DATA_DIR="${DATA_DIR:-/data}"
-HTTP_DIR="${TFTP_DIR}/tftp"
+TFTP_DIR="${DATA_DIR}/tftp"
 mkdir -p "${TFTP_DIR}"
 
+PXE_SERVER_IP=${PXE_SERVER_IP:-}
+ISO_FILE=${ISO_FILE:-}
+if [[ -n "${PXE_SERVER_IP}" && -n "${ISO_FILE}" ]]; then
+    mkdir -p "${TFTP_DIR}/grub"
+    cat /templates/grub.cfg.template | envsubst > "${TFTP_DIR}/grub/grub.cfg"
+fi
+set -x
 exec /usr/sbin/in.tftpd --listen --foreground -verbosity 4 --secure --ipv4 "${TFTP_DIR}"

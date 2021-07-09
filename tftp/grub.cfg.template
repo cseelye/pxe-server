@@ -1,0 +1,13 @@
+default=autoinstall
+timeout=5
+timeout_style=menu
+menuentry "Auto install" --id=autoinstall {
+	echo "Loading..."
+	linux /vmlinuz ip=dhcp url=http://${PXE_SERVER_IP}/${ISO_FILE} autoinstall ds="nocloud-net;s=http://${PXE_SERVER_IP}/" root=/dev/ram0 cloud-config-url=/dev/null
+	initrd /initrd
+}
+menuentry "Manually install" --id=manualinstall {
+	echo "Loading..."
+	linux /vmlinuz ip=dhcp url=http://${PXE_SERVER_IP}/${ISO_FILE} root=/dev/ram0 cloud-config-url=/dev/null
+	initrd /initrd
+}

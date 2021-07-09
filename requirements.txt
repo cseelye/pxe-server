@@ -1,0 +1,5 @@
+supervisor
+supervisord-dependent-startup
+
+fastapi
+aiofiles

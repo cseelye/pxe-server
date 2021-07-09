@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+
+DATA_DIR="${DATA_DIR:-/data}"
+DHCP_DIR="${DATA_DIR}"/dhcp
+mkdir -p "${DHCP_DIR}"
+
+CONF_FILE=${DHCP_DIR}/dhcpd.conf
+LEASE_FILE=${DHCP_DIR}/dhcpd.leases
+touch "${LEASE_FILE}"
+
+PXE_SERVER_IP=${PXE_SERVER_IP:-}
+NETWORK=${NETWORK:-}
+NETMASK=${NETMASK:-}
+ROUTER_IP=${ROUTER_IP:-}
+DNS_IP=${DNS_IP:-}
+TARGET_SERVER_NAME=${TARGET_SERVER_NAME:-}
+TARGET_SERVER_MAC=${TARGET_SERVER_MAC:-}
+TARGET_SERVER_IP=${TARGET_SERVER_IP:-}
+if [[ -n "${PXE_SERVER_IP}" && -n "${NETWORK}" && -n "${NETMASK}" && -n "${ROUTER_IP}" && \
+      -n "${DNS_IP}" && -n "${TARGET_SERVER_NAME}" && -n "${TARGET_SERVER_MAC}" && -n "${TARGET_SERVER_IP}" ]]; then
+    cat /templates/dhcpd.conf.template | envsubst > "${CONF_FILE}"
+fi
+
+IFACE=${IFACE:-}
+exec /usr/sbin/dhcpd -4 -f --no-pid -cf "${CONF_FILE}" -lf "${LEASE_FILE}" ${IFACE}

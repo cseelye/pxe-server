@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+DATA_DIR="${DATA_DIR:-/data}"
+HTTP_DIR="${DATA_DIR}/http"
+mkdir -p "${HTTP_DIR}"
+
+export HTTP_DIR
+cat /templates/nginx.conf.template | envsubst '${HTTP_DIR}' > /etc/nginx/nginx.conf
+
+exec /usr/sbin/nginx -g "daemon off;"

@@ -1,0 +1,15 @@
+
+deny unknown-clients;
+
+subnet ${NETWORK} netmask ${NETMASK} {              # Network and netmask for this subnet
+    option routers ${ROUTER_IP};                    # Router/default gateway IP
+    option domain-name-servers ${DNS_IP};           # DNS server IP
+    group {
+        host ${TARGET_SERVER_NAME} {                # Name of the target server
+            hardware ethernet ${TARGET_SERVER_MAC}; # MAC address of the NIC to boot from on the target server
+            fixed-address ${TARGET_SERVER_IP};       # IP address for the target server to use
+            next-server ${PXE_SERVER_IP};           # IP address of the PXE server
+            filename "/pxelinux.0";
+        }
+    }
+}

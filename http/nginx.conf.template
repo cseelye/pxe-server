@@ -1,0 +1,38 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+    worker_connections 768;
+}
+
+http {
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    server_tokens off;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log syslog:server=unix:/dev/log,tag=nginx,nohostname,severity=debug combined;
+    error_log syslog:server=unix:/dev/log,tag=nginx,nohostname,severity=error;
+
+    server {
+        listen 80 default_server;
+        root ${HTTP_DIR};
+        index index.nginx-debian.html;
+        server_name _;
+
+        location / {
+            autoindex on;
+            # First attempt to serve request as file, then
+            # as directory, then fall back to displaying a 404.
+            try_files $uri $uri/ =404;
+        }
+    }
+}

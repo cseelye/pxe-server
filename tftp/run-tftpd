@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+DATA_DIR="${DATA_DIR:-/data}"
+HTTP_DIR="${TFTP_DIR}/tftp"
+mkdir -p "${TFTP_DIR}"
+
+exec /usr/sbin/in.tftpd --listen --foreground -verbosity 4 --secure --ipv4 "${TFTP_DIR}"

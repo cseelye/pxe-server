@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+# Wait for syslog to start
+echo "Waiting for syslog to start"
+while ! netstat -lnpu | grep -q rsyslogd; do
+    sleep 1
+done
+
+logger -t startup "Starting services"
+supervisorctl start all

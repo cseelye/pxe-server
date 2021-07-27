@@ -33,6 +33,9 @@ RUN apt-get update && \
 
 COPY --from=builder /install /usr/local/
 
+# Add the troubleshooting scripts
+COPY scripts /scripts
+
 # supervisor configuration
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 

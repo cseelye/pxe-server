@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /usr/lib/nagios/plugins/check_dhcp -v -s ${PXE_SERVER_IP} -r ${TARGET_SERVER_IP} -m ${TARGET_SERVER_MAC} -i ${IFACE}

@@ -9,5 +9,4 @@ done
 
 logger -t startup "Starting services"
 supervisorctl start all
-
 logger -t startup "Finished startup"

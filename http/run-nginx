@@ -8,4 +8,11 @@ mkdir -p "${HTTP_DIR}"
 export HTTP_DIR
 cat /templates/nginx.conf.template | envsubst '${HTTP_DIR}' > /etc/nginx/nginx.conf
 
+touch "${HTTP_DIR}"/vendor-data
+
+if [[ -n "${TARGET_SERVER_NAME}" && -n "${TARGET_PW_HASH}" && -n "${TARGET_USERNAME}" && -n "${TARGET_SERVER_NIC}" && -n "${TARGET_SERVER_IP}" && -n "${CIDR}" && -n "${ROUTER_IP}" && -n "${DNS_IP}" ]]; then
+    cat /templates/meta-data.template | envsubst > "${HTTP_DIR}"/meta-data
+    cat /templates/user-data.template | envsubst > "${HTTP_DIR}"/user-data
+fi
+
 exec /usr/sbin/nginx -g "daemon off;"

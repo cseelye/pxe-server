@@ -46,7 +46,7 @@ COPY rsyslog/rsyslog-service.conf /etc/supervisor/conf.d/rsyslog-service.conf
 
 # nginx configuration
 COPY http/http-service.conf /etc/supervisor/conf.d/http-service.conf
-COPY http/nginx.conf.template /templates/nginx.conf.template
+COPY http/*.template /templates/
 COPY http/run-nginx /usr/local/bin/run-nginx
 
 # dhcpd configuration

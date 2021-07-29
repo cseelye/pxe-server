@@ -20,6 +20,11 @@ autoinstall:
         nameservers:
           addresses: [ ${DNS_IP} ]
     version: 2
+  reporting:
+    hook:
+      type: webhook
+      endpoint: "http://${PXE_SERVER_IP}:9000/hooks/install-status"
+      level: DEBUG
   ssh:
     allow-pw: true
     authorized-keys: []

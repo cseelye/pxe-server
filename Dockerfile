@@ -26,6 +26,8 @@ RUN apt-get update && \
         rsyslog \
         tftp \
         tftpd-hpa \
+        vim \
+        webhook \
     && \
     apt-get autoremove -y && \
     apt-get clean && \
@@ -63,6 +65,11 @@ COPY dhcp/dhcpd.conf.template /templates/dhcpd.conf.template
 COPY tftp/tftp-service.conf /etc/supervisor/conf.d/tftp-service.conf
 COPY tftp/run-tftpd /usr/local/bin/run-tftpd
 COPY tftp/grub.cfg.template /templates/grub.cfg.template
+
+# Installer progress webhook
+COPY status-service/status-service.conf /etc/supervisor/conf.d/status-service.conf
+COPY status-service/status-event /status-service/status-event
+COPY status-service/status-hook.yaml /status-service/status-hook.yaml
 
 # dhcp config, tftp and http content are expected to be in this volume mount
 VOLUME /data

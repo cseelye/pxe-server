@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install --yes \
         python3 \
         python3-pip
 COPY requirements.txt /tmp/requirements.txt
-RUN pip --no-cache-dir --disable-pip-version-check install --no-compile --prefix /install \
+RUN pip3 --no-cache-dir --disable-pip-version-check install --upgrade pip && \
+    pip3 --no-cache-dir --disable-pip-version-check install --no-compile --force-reinstall --prefix /install \
     --requirement /tmp/requirements*.txt
 
 FROM base as final
@@ -23,7 +24,6 @@ RUN apt-get update && \
         nmap \
         python3 \
         rsyslog \
-        supervisor \
         tftp \
         tftpd-hpa \
     && \
@@ -32,6 +32,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /install /usr/local/
+# Hack for dist-packages vs site-packages
+RUN cd /usr/local/lib/python* && rm -r dist-packages && ln -fs site-packages dist-packages
 
 # Add the troubleshooting scripts
 COPY scripts /scripts
@@ -65,4 +67,4 @@ COPY tftp/grub.cfg.template /templates/grub.cfg.template
 # dhcp config, tftp and http content are expected to be in this volume mount
 VOLUME /data
 
-ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+ENTRYPOINT ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

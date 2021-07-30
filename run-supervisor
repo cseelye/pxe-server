@@ -1,0 +1,27 @@
+#!/bin/bash
+set -euo pipefail
+
+# This is a very simple wrapper around supervisord to make sure the minimum environment exists for the various services.
+
+# Default environment if it is not already set
+export DATA_DIR="${DATA_DIR:-/data}"
+export DHCP_DIR="${DATA_DIR}/dhcp"
+export TFTP_DIR="${DATA_DIR}/tftp"
+export HTTP_DIR="${DATA_DIR}/http"
+export PXE_SERVER_IP=${PXE_SERVER_IP:-}
+export ISO_FILE=${ISO_FILE:-}
+export NETWORK=${NETWORK:-}
+export NETMASK=${NETMASK:-}
+export CIDR=${CIDR:-}
+export ROUTER_IP=${ROUTER_IP:-}
+export DNS_IP=${DNS_IP:-}
+export TARGET_SERVER_NAME=${TARGET_SERVER_NAME:-}
+export TARGET_SERVER_MAC=${TARGET_SERVER_MAC:-}
+export TARGET_SERVER_IP=${TARGET_SERVER_IP:-}
+export TARGET_SERVER_NIC=${TARGET_SERVER_NIC:-}
+export TARGET_PW_HASH=${TARGET_PW_HASH:-}
+export TARGET_USERNAME=${TARGET_USERNAME:-}
+export IFACE=${IFACE:-}
+
+# Start supervisord
+exec /usr/local/bin/supervisord -c /etc/supervisor/supervisord.conf

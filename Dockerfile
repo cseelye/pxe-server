@@ -37,34 +37,24 @@ COPY --from=builder /install /usr/local/
 # Hack for dist-packages vs site-packages
 RUN cd /usr/local/lib/python* && rm -r dist-packages && ln -fs site-packages dist-packages
 
+# rsyslog service
+COPY rsyslog/rsyslog.conf /etc/rsyslog.conf
+COPY rsyslog/rsyslog-service.conf /etc/supervisor/conf.d/rsyslog-service.conf
+
+# Other services
+COPY services/*.conf /etc/supervisor/conf.d/
+
 # Add the troubleshooting scripts
 COPY scripts /scripts
 
 # supervisor configuration
 COPY supervisord.conf /etc/supervisor/supervisord.conf
+COPY run-supervisor /usr/local/bin/run-supervisor
 
 # Startup control service
 COPY startup-service/startup /usr/local/bin/startup
 COPY startup-service/startup-service.conf /etc/supervisor/conf.d/startup-service.conf
-
-# rsyslog configuration
-COPY rsyslog/rsyslog.conf /etc/rsyslog.conf
-COPY rsyslog/rsyslog-service.conf /etc/supervisor/conf.d/rsyslog-service.conf
-
-# nginx configuration
-COPY http/http-service.conf /etc/supervisor/conf.d/http-service.conf
-COPY http/*.template /templates/
-COPY http/run-nginx /usr/local/bin/run-nginx
-
-# dhcpd configuration
-COPY dhcp/dhcp-service.conf /etc/supervisor/conf.d/dhcp-service.conf
-COPY dhcp/run-dhcpd /usr/local/bin/run-dhcpd
-COPY dhcp/dhcpd.conf.template /templates/dhcpd.conf.template
-
-# tftpd configuration
-COPY tftp/tftp-service.conf /etc/supervisor/conf.d/tftp-service.conf
-COPY tftp/run-tftpd /usr/local/bin/run-tftpd
-COPY tftp/grub.cfg.template /templates/grub.cfg.template
+COPY templates /templates
 
 # Installer progress webhook
 COPY status-service/status-service.conf /etc/supervisor/conf.d/status-service.conf
@@ -74,4 +64,4 @@ COPY status-service/status-hook.yaml /status-service/status-hook.yaml
 # dhcp config, tftp and http content are expected to be in this volume mount
 VOLUME /data
 
-ENTRYPOINT ["/usr/local/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+ENTRYPOINT ["/usr/local/bin/run-supervisor"]

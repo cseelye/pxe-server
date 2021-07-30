@@ -7,13 +7,17 @@ while ! netstat -lnpu | grep -q rsyslogd; do
     sleep 1
 done
 
+# All output after this is redirected to syslog via logger command
+exec 1> >(logger -t startup)
+exec 2>&1
+
 mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}"
 
 # Configure cloud-init files
 if [[ -n "${TARGET_SERVER_NAME}" && -n "${TARGET_PW_HASH}" && -n "${TARGET_USERNAME}" && \
       -n "${TARGET_SERVER_NIC}" && -n "${TARGET_SERVER_IP}" && -n "${CIDR}" && \
       -n "${ROUTER_IP}" && -n "${DNS_IP}" ]]; then
-    logger -t startup "Updating cloud-init data"
+    echo "Updating cloud-init data"
     cat /templates/meta-data.template | envsubst > "${HTTP_DIR}"/meta-data
     cat /templates/user-data.template | envsubst > "${HTTP_DIR}"/user-data
     cat /templates/vendor-data.template | envsubst > "${HTTP_DIR}"/vendor-data
@@ -22,7 +26,7 @@ fi
 # Configure grub
 if [[ -n "${PXE_SERVER_IP}" && -n "${ISO_FILE}" ]]; then
     mkdir -p "${TFTP_DIR}/grub"
-    logger -t startup "Updating bootloader config"
+    echo "Updating bootloader config"
     cat /templates/grub.cfg.template | envsubst > "${TFTP_DIR}/grub/grub.cfg"
 fi
 
@@ -30,7 +34,7 @@ fi
 if [[ -n "${PXE_SERVER_IP}" && -n "${NETWORK}" && -n "${NETMASK}" && \
       -n "${ROUTER_IP}" && -n "${DNS_IP}" && -n "${TARGET_SERVER_NAME}" && \
       -n "${TARGET_SERVER_MAC}" && -n "${TARGET_SERVER_IP}" ]]; then
-    logger -t startup "Updating dhcp config"
+    echo "Updating dhcp config"
     cat /templates/dhcpd.conf.template | envsubst > "${DHCP_DIR}/dhcpd.conf"
     touch "${DHCP_DIR}/dhcpd.leases"
 fi
@@ -38,6 +42,6 @@ fi
 # Configure nginx
 cat /templates/nginx.conf.template | envsubst '${HTTP_DIR}' > /etc/nginx/nginx.conf
 
-logger -t startup "Starting services"
+echo "Starting services"
 supervisorctl start all
-logger -t startup "Finished startup"
+echo "Finished startup"

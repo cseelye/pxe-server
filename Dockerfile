@@ -23,6 +23,7 @@ RUN apt-get update && \
         nginx \
         nmap \
         python3 \
+        rsync \
         rsyslog \
         tftp \
         tftpd-hpa \
@@ -51,6 +52,10 @@ RUN cd /usr/local/lib/python* && rm -r dist-packages && ln -fs site-packages dis
 # rsyslog service
 COPY rsyslog/rsyslog.conf /etc/rsyslog.conf
 COPY rsyslog/rsyslog-service.conf /etc/supervisor/conf.d/rsyslog-service.conf
+
+# rsync service
+COPY rsync/rsyncd.conf /etc/rsyncd.conf
+COPY rsync/rsync-service.conf /etc/supervisor/conf.d/rsync-service.conf
 
 # Other services
 COPY services/*.conf /etc/supervisor/conf.d/

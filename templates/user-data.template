@@ -8,6 +8,8 @@ autoinstall:
       uri: http://archive.ubuntu.com/ubuntu
     - arches: [default]
       uri: http://ports.ubuntu.com/ubuntu-ports
+  error-commands:
+  - "rsync -av /var/crash/* rsync://${PXE_SERVER_IP}:/crash/"
   identity: {hostname: ${TARGET_SERVER_NAME}, password: ${TARGET_PW_HASH}, realname: ${TARGET_USERNAME}, username: ${TARGET_USERNAME}}
   keyboard: {layout: us, toggle: null, variant: ''}
   locale: en_US

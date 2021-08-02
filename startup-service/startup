@@ -11,7 +11,7 @@ done
 exec 1> >(logger -t startup)
 exec 2>&1
 
-mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}"
+mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}" "${CRASH_DIR}"
 
 # Install grub if needed
 if [[ ! -e "${TFTP_DIR}"/grubnetx64.efi.signed || ! -e "${TFTP_DIR}"/grub/x86_64-efi ]]; then

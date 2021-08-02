@@ -8,6 +8,7 @@ export DATA_DIR="${DATA_DIR:-/data}"
 export DHCP_DIR="${DATA_DIR}/dhcp"
 export TFTP_DIR="${DATA_DIR}/tftp"
 export HTTP_DIR="${DATA_DIR}/http"
+export CRASH_DIR="${DATA_DIR}/crash"
 export PXE_SERVER_IP=${PXE_SERVER_IP:-}
 export ISO_URL=${ISO_URL:-}
 export ISO_FILE=${ISO_FILE:-}

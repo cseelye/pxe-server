@@ -13,21 +13,74 @@ exec 2>&1
 
 mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}"
 
-# Configure cloud-init files
+# Install grub if needed
+if [[ ! -e "${TFTP_DIR}"/grubnetx64.efi.signed || ! -e "${TFTP_DIR}"/grub/x86_64-efi ]]; then
+    echo "Getting bootloader"
+    tmpdir=$(mktemp -d)
+    (
+        cd "${tmpdir}"
+        curl -sSL http://mirrors.edge.kernel.org/ubuntu/pool/main/g/grub2-signed/grub-efi-amd64-signed_1.169%2B2.04-1ubuntu45_amd64.deb -o grub-efi-signed.deb
+        dpkg-deb -x grub-efi-signed.deb .
+        cp usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed "${TFTP_DIR}"/
+
+        curl -sSL http://mirrors.kernel.org/ubuntu/pool/main/g/grub2-unsigned/grub-efi-amd64-bin_2.04-1ubuntu45_amd64.deb -o grub-efi-modules.deb
+        dpkg-deb -x grub-efi-modules.deb .
+        mkdir -p "${TFTP_DIR}"/grub/
+        cp -r usr/lib/grub/x86_64-efi "${TFTP_DIR}"/grub/
+    )
+    rm -rf "${tmpdir}"
+fi
+
+# Get the kernel and initrd
+if [[ (! -e "${TFTP_DIR}"/vmlinuz-${ISO_FILE} || ! -e "${TFTP_DIR}"/initrd-${ISO_FILE}) && -n ${ISO_FILE} ]]; then
+    echo "Extracting kernel/initrd from iso"
+    mount "${HTTP_DIR}"/${ISO_FILE} /mnt
+    cp /mnt/casper/vmlinuz "${TFTP_DIR}/vmlinuz-${ISO_FILE}"
+    cp /mnt/casper/initrd "${TFTP_DIR}/initrd-${ISO_FILE}"
+    umount /mnt
+fi
+
+# Create subdir for this server
+TARGET_CONF_DIR_TFTP=""
+if [[ -n "${TARGET_SERVER_MAC}" ]]; then
+    TARGET_SERVER_MAC_DASHES="$( echo "${TARGET_SERVER_MAC}" | tr ':' '-')"
+    export TARGET_CONF_DIR_HTTP="${HTTP_DIR}/${TARGET_SERVER_MAC_DASHES}"
+    export TARGET_CONF_DIR_TFTP="${TFTP_DIR}/${TARGET_SERVER_MAC_DASHES}"
+    mkdir -p "${TARGET_CONF_DIR_HTTP}"
+    mkdir -p "${TARGET_CONF_DIR_TFTP}"
+fi
+
+# Configure kernel and initrd for this server
+if [[ -n "${TARGET_CONF_DIR_TFTP}" && (! -e "${TARGET_CONF_DIR_TFTP}"/vmlinuz || ! -e "${TARGET_CONF_DIR_TFTP}"/initrd) ]]; then
+    (
+        cd "${TARGET_CONF_DIR_TFTP}"
+        ln -fs ../vmlinuz-${ISO_FILE} vmlinuz
+        ln -fs ../initrd-${ISO_FILE} initrd
+    )
+fi
+
+# Configure cloud-init files for this server
 if [[ -n "${TARGET_SERVER_NAME}" && -n "${TARGET_PW_HASH}" && -n "${TARGET_USERNAME}" && \
       -n "${TARGET_SERVER_NIC}" && -n "${TARGET_SERVER_IP}" && -n "${CIDR}" && \
-      -n "${ROUTER_IP}" && -n "${DNS_IP}" ]]; then
+      -n "${ROUTER_IP}" && -n "${DNS_IP}" && -n "${TARGET_CONF_DIR_HTTP}" ]]; then
     echo "Updating cloud-init data"
-    cat /templates/meta-data.template | envsubst > "${HTTP_DIR}"/meta-data
-    cat /templates/user-data.template | envsubst > "${HTTP_DIR}"/user-data
-    cat /templates/vendor-data.template | envsubst > "${HTTP_DIR}"/vendor-data
+    cat /templates/meta-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/meta-data
+    cat /templates/user-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/user-data
+    cat /templates/vendor-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/vendor-data
+fi
+
+# Link ISO file for this server to install
+if [[ -n "${ISO_FILE}" ]]; then
+    (
+        cd "${TARGET_CONF_DIR_HTTP}"
+        ln -fs ../"${ISO_FILE}" install.iso
+    )
 fi
 
 # Configure grub
-if [[ -n "${PXE_SERVER_IP}" && -n "${ISO_FILE}" ]]; then
-    mkdir -p "${TFTP_DIR}/grub"
-    echo "Updating bootloader config"
-    cat /templates/grub.cfg.template | envsubst > "${TFTP_DIR}/grub/grub.cfg"
+mkdir -p "${TFTP_DIR}/grub"
+if [[ ! -e "${TFTP_DIR}/grub/grub.cfg" ]]; then
+    cp /templates/grub.cfg.template "${TFTP_DIR}/grub/grub.cfg"
 fi
 
 # Configure dhcpd

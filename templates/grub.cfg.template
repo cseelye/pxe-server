@@ -12,12 +12,14 @@ default=autoinstall
 timeout=5
 timeout_style=menu
 menuentry "Auto install" --id=autoinstall {
-	echo "Loading..."
+	echo "Loading kernel [/${mac_dashes}/vmlinuz] ..."
 	linux /${mac_dashes}/vmlinuz ip=dhcp url="${iso_url}" autoinstall ds="nocloud-net;s=${ds_url}/" root=/dev/ram0 cloud-config-url=/dev/null
+	echo "Loading initrd [/${mac_dashes}/initrd] ..."
 	initrd /${mac_dashes}/initrd
 }
 menuentry "Manually install" --id=manualinstall {
-	echo "Loading..."
+	echo "Loading kernel [/${mac_dashes}/vmlinuz] ..."
 	linux /${mac_dashes}/vmlinuz ip=dhcp url="${iso_url}" root=/dev/ram0 cloud-config-url=/dev/null
+	echo "Loading initrd [/${mac_dashes}/initrd] ..."
 	initrd /${mac_dashes}/initrd
 }

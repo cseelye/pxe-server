@@ -15,20 +15,10 @@ mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}"
 
 # Install grub if needed
 if [[ ! -e "${TFTP_DIR}"/grubnetx64.efi.signed || ! -e "${TFTP_DIR}"/grub/x86_64-efi ]]; then
-    echo "Getting bootloader"
-    tmpdir=$(mktemp -d)
-    (
-        cd "${tmpdir}"
-        curl -sSL http://mirrors.edge.kernel.org/ubuntu/pool/main/g/grub2-signed/grub-efi-amd64-signed_1.169%2B2.04-1ubuntu45_amd64.deb -o grub-efi-signed.deb
-        dpkg-deb -x grub-efi-signed.deb .
-        cp usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed "${TFTP_DIR}"/
-
-        curl -sSL http://mirrors.kernel.org/ubuntu/pool/main/g/grub2-unsigned/grub-efi-amd64-bin_2.04-1ubuntu45_amd64.deb -o grub-efi-modules.deb
-        dpkg-deb -x grub-efi-modules.deb .
-        mkdir -p "${TFTP_DIR}"/grub/
-        cp -r usr/lib/grub/x86_64-efi "${TFTP_DIR}"/grub/
-    )
-    rm -rf "${tmpdir}"
+    echo "Installing bootloader"
+    mkdir -p "${TFTP_DIR}"/grub
+    cp /grubfiles/grubnetx64.efi.signed "${TFTP_DIR}"/
+    cp -r /grubfiles/x86_64-efi "${TFTP_DIR}"/grub/
 fi
 
 # Get the kernel and initrd

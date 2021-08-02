@@ -33,6 +33,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Get the files we need for grub to use as a bootloader when PXE booting
+RUN apt-get update && \
+    apt-get install --yes grub-efi-amd64-signed grub-efi && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /grubfiles && \
+    cp /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed /grubfiles/ && \
+    cp -r usr/lib/grub/x86_64-efi /grubfiles/ && \
+    apt-get purge --yes grub-efi-amd64-signed grub-efi
+
+# Copy in the python packages from the builder image
 COPY --from=builder /install /usr/local/
 # Hack for dist-packages vs site-packages
 RUN cd /usr/local/lib/python* && rm -r dist-packages && ln -fs site-packages dist-packages

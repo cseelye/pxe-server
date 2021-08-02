@@ -11,10 +11,10 @@ First get the ISO file you want to install from -
 export BASE_DIR=pxe-data
 export ISO_FILE=ubuntu-20.04.2-live-server-amd64.iso
 
-mkdir -p "${BASE_DIR}"/{dhcp,tftp,http} 
+mkdir -p "${BASE_DIR}"/{dhcp,tftp,http}
 
 # Get the ISO to boot
-curl https://releases.ubuntu.com/20.04.2/ubuntu-20.04.2-live-server-amd64.iso -o "${BASE_DIR}"/http/${ISO_FILE}
+curl -L https://releases.ubuntu.com/20.04.2/ubuntu-20.04.2-live-server-amd64.iso -o "${BASE_DIR}"/http/${ISO_FILE}
 ```
 
 ### Automated Setup
@@ -40,7 +40,7 @@ TARGET_PW_HASH='\$6\$lkLartS6w73V9oIY\$Jj4UouHhPh8EyERJH8tB5WQ4cjbGjbmFQ6kHnxxnh
 TARGET_USERNAME=user
 EOF
 
-docker container run --rm -it --net=host --name=pxe-server -v $(pwd)/"${BASE_DIR}":/data --env-file pxe-env pxe-server
+docker container run --rm -it --net=host --privileged --name=pxe-server -v $(pwd)/"${BASE_DIR}":/data --env-file pxe-env pxe-server
 ```
 
 ### Manual Setup

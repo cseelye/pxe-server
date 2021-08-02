@@ -1,5 +1,5 @@
 # pxe-server
-All in one DHCP/TFTP/HTTP server container for installing linux over the network via PXE booting.
+All in one DHCP/TFTP/HTTP server container for installing linux over the network via PXE booting. This is written to automate installing Ubuntu 20.04 server, but can install other distros with some tweaks.
 
 Note that the container will run on macOS/Windows, but will not serve DHCP correctly (due to the way docker works on those platforms plus some assumptions in dhcpd). These instructions are written to be used on linux.
 
@@ -7,9 +7,8 @@ Note that the container will run on macOS/Windows, but will not serve DHCP corre
 There are two ways to use this container - automated or manual setup. The automated method is quick and easy but makes some assumptions and may need modification for your environment. The manual setup requires additional setup and per-server configuration but allows more flexibility.
 
 ### Automated Setup
-Create a directory to hold the config files and install files, write an env file to describe your network and target server, and then pass the environment into the container. To change a value, stop the container, edit the file, and launch the container again. The startup scripts in the container read the env variables and write out the appropriate config files for the various services each time the container starts.
+Create a directory to hold the config files and install files, write an env file to describe your network and target server, and then pass the environment into the container. To change a value, stop the container, edit the env file, and launch the container again. The startup scripts in the container read the env variables and write out the appropriate config files for the various services each time the container starts.
 
-Of course you can also export each value individually and then reference it on the docker command line instead (export ABC=abc, -e ABC).
 ```shell
 mkdir pxe-data
 cat > pxe-env <<EOF

@@ -21,29 +21,35 @@ if [[ ! -e "${TFTP_DIR}"/grubnetx64.efi.signed || ! -e "${TFTP_DIR}"/grub/x86_64
     cp -r /grubfiles/x86_64-efi "${TFTP_DIR}"/grub/
 fi
 
+# Get the ISO if needed
+if [[ ! -e "${HTTP_DIR}"/${ISO_FILE} && -n ${ISO_URL} ]]; then
+    echo "Downloading ISO from [${ISO_URL}]"
+    curl -sSL ${ISO_URL} -o "${HTTP_DIR}"/${ISO_FILE}
+fi
+
 # Get the kernel and initrd
 if [[ (! -e "${TFTP_DIR}"/vmlinuz-${ISO_FILE} || ! -e "${TFTP_DIR}"/initrd-${ISO_FILE}) && -n ${ISO_FILE} ]]; then
     echo "Extracting kernel/initrd from iso"
-    mount "${HTTP_DIR}"/${ISO_FILE} /mnt
+    mount -o loop,ro "${HTTP_DIR}"/${ISO_FILE} /mnt
     cp /mnt/casper/vmlinuz "${TFTP_DIR}/vmlinuz-${ISO_FILE}"
     cp /mnt/casper/initrd "${TFTP_DIR}/initrd-${ISO_FILE}"
     umount /mnt
 fi
 
 # Create subdir for this server
-TARGET_CONF_DIR_TFTP=""
+target_conf_dir_tftp=""
 if [[ -n "${TARGET_SERVER_MAC}" ]]; then
-    TARGET_SERVER_MAC_DASHES="$( echo "${TARGET_SERVER_MAC}" | tr ':' '-')"
-    export TARGET_CONF_DIR_HTTP="${HTTP_DIR}/${TARGET_SERVER_MAC_DASHES}"
-    export TARGET_CONF_DIR_TFTP="${TFTP_DIR}/${TARGET_SERVER_MAC_DASHES}"
-    mkdir -p "${TARGET_CONF_DIR_HTTP}"
-    mkdir -p "${TARGET_CONF_DIR_TFTP}"
+    target_server_mac_dashes="$( echo "${TARGET_SERVER_MAC}" | tr ':' '-')"
+    target_conf_dir_http="${HTTP_DIR}/${target_server_mac_dashes}"
+    target_conf_dir_tftp="${TFTP_DIR}/${target_server_mac_dashes}"
+    mkdir -p "${target_conf_dir_http}"
+    mkdir -p "${target_conf_dir_tftp}"
 fi
 
 # Configure kernel and initrd for this server
-if [[ -n "${TARGET_CONF_DIR_TFTP}" && (! -e "${TARGET_CONF_DIR_TFTP}"/vmlinuz || ! -e "${TARGET_CONF_DIR_TFTP}"/initrd) ]]; then
+if [[ -n "${target_conf_dir_tftp}" && (! -e "${target_conf_dir_tftp}"/vmlinuz || ! -e "${target_conf_dir_tftp}"/initrd) ]]; then
     (
-        cd "${TARGET_CONF_DIR_TFTP}"
+        cd "${target_conf_dir_tftp}"
         ln -fs ../vmlinuz-${ISO_FILE} vmlinuz
         ln -fs ../initrd-${ISO_FILE} initrd
     )
@@ -52,17 +58,17 @@ fi
 # Configure cloud-init files for this server
 if [[ -n "${TARGET_SERVER_NAME}" && -n "${TARGET_PW_HASH}" && -n "${TARGET_USERNAME}" && \
       -n "${TARGET_SERVER_NIC}" && -n "${TARGET_SERVER_IP}" && -n "${CIDR}" && \
-      -n "${ROUTER_IP}" && -n "${DNS_IP}" && -n "${TARGET_CONF_DIR_HTTP}" ]]; then
+      -n "${ROUTER_IP}" && -n "${DNS_IP}" && -n "${target_conf_dir_http}" ]]; then
     echo "Updating cloud-init data"
-    cat /templates/meta-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/meta-data
-    cat /templates/user-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/user-data
-    cat /templates/vendor-data.template | envsubst > "${TARGET_CONF_DIR_HTTP}"/vendor-data
+    cat /templates/meta-data.template | envsubst > "${target_conf_dir_http}"/meta-data
+    cat /templates/user-data.template | envsubst > "${target_conf_dir_http}"/user-data
+    cat /templates/vendor-data.template | envsubst > "${target_conf_dir_http}"/vendor-data
 fi
 
 # Link ISO file for this server to install
 if [[ -n "${ISO_FILE}" ]]; then
     (
-        cd "${TARGET_CONF_DIR_HTTP}"
+        cd "${target_conf_dir_http}"
         ln -fs ../"${ISO_FILE}" install.iso
     )
 fi

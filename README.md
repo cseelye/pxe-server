@@ -52,7 +52,8 @@ pxe-data
     │   └── vmlinuz -> ../vmlinuz-ubuntu-20.04.2-live-server-amd64.iso
     ├── grub
     │   ├── grub.cfg
-    ├── grubnetx64.efi.signed
+    ├── bootx64.efi
+    ├── grubx64.efi
     ├── initrd-ubuntu-20.04.2-live-server-amd64.iso
     └── vmlinuz-ubuntu-20.04.2-live-server-amd64.iso
 ```
@@ -60,3 +61,7 @@ See the startup script for how this is created. When the files are prepared, run
 ```
 docker container run --rm -it --net=host --name=pxe-server -v $(pwd)/pxe-data:/data pxe-server
 ```
+
+# References
+Ubuntu installer - https://ubuntu.com/server/docs/install/autoinstall-reference
+Grub network booting - https://www.gnu.org/software/grub/manual/grub/html_node/Network.html

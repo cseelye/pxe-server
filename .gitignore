@@ -1,4 +1,6 @@
-pxe-data
+pxe-data*
+pxe-env*
+*.tar
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

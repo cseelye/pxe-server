@@ -1,13 +1,25 @@
+
+insmod efi_gop
+insmod efi_uga
+
+regexp --set 1:m1 --set 2:m2 --set 3:m3 --set 4:m4 --set 5:m5 --set 6:m6 '(\w{2}):(\w{2}):(\w{2}):(\w{2}):(\w{2}):(\w{2})' ${net_default_mac}
+mac_dashes="${m1}-${m2}-${m3}-${m4}-${m5}-${m6}"
+eval "set server_ip=\${net_${net_default_interface}_next_server}"
+set ds_url="http://${server_ip}/${mac_dashes}"
+set iso_url="http://${server_ip}/${mac_dashes}/install.iso"
+
 default=autoinstall
 timeout=5
 timeout_style=menu
 menuentry "Auto install" --id=autoinstall {
-	echo "Loading..."
-	linux /vmlinuz ip=dhcp url=http://${PXE_SERVER_IP}/${ISO_FILE} autoinstall ds="nocloud-net;s=http://${PXE_SERVER_IP}/" root=/dev/ram0 cloud-config-url=/dev/null
-	initrd /initrd
+	echo "Loading kernel [/${mac_dashes}/vmlinuz] ..."
+	linux /${mac_dashes}/vmlinuz ip=dhcp url="${iso_url}" autoinstall ds="nocloud-net;s=${ds_url}/" root=/dev/ram0 cloud-config-url=/dev/null
+	echo "Loading initrd [/${mac_dashes}/initrd] ..."
+	initrd /${mac_dashes}/initrd
 }
 menuentry "Manually install" --id=manualinstall {
-	echo "Loading..."
-	linux /vmlinuz ip=dhcp url=http://${PXE_SERVER_IP}/${ISO_FILE} root=/dev/ram0 cloud-config-url=/dev/null
-	initrd /initrd
+	echo "Loading kernel [/${mac_dashes}/vmlinuz] ..."
+	linux /${mac_dashes}/vmlinuz ip=dhcp url="${iso_url}" root=/dev/ram0 cloud-config-url=/dev/null
+	echo "Loading initrd [/${mac_dashes}/initrd] ..."
+	initrd /${mac_dashes}/initrd
 }

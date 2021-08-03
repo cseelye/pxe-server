@@ -14,10 +14,11 @@ exec 2>&1
 mkdir -p "${DHCP_DIR}" "${TFTP_DIR}" "${HTTP_DIR}" "${CRASH_DIR}"
 
 # Install grub if needed
-if [[ ! -e "${TFTP_DIR}"/grubnetx64.efi.signed || ! -e "${TFTP_DIR}"/grub/x86_64-efi ]]; then
+if [[ ! -e "${TFTP_DIR}"/grubx64.efi || ! -e "${TFTP_DIR}"/bootx64.efi || \
+      ! -e "${TFTP_DIR}"/grub/x86_64-efi ]]; then
     echo "Installing bootloader"
     mkdir -p "${TFTP_DIR}"/grub
-    cp /grubfiles/grubnetx64.efi.signed "${TFTP_DIR}"/
+    cp /grubfiles/grubx64.efi /grubfiles/bootx64.efi "${TFTP_DIR}"/
     cp -r /grubfiles/x86_64-efi "${TFTP_DIR}"/grub/
 fi
 

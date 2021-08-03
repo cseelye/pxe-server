@@ -30,19 +30,19 @@ RUN apt-get update && \
         vim \
         webhook \
     && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Get the files we need for grub to use as a bootloader when PXE booting
 RUN apt-get update && \
-    apt-get install --yes grub-efi-amd64-signed grub-efi && \
+    apt-get install --yes --no-install-recommends grub-efi-amd64-signed grub-efi shim-signed && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir /grubfiles && \
-    cp /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed /grubfiles/ && \
+    cp /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed /grubfiles/grubx64.efi && \
     cp -r usr/lib/grub/x86_64-efi /grubfiles/ && \
-    apt-get purge --yes grub-efi-amd64-signed grub-efi
+    cp /usr/lib/shim/shimx64.efi.signed /grubfiles/bootx64.efi && \
+    apt-get purge --yes --allow-remove-essential grub-efi-amd64-signed grub-efi shim-signed && \
+    apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy in the python packages from the builder image
 COPY --from=builder /install /usr/local/

@@ -9,7 +9,7 @@ subnet ${NETWORK} netmask ${NETMASK} {              # Network and netmask for th
             hardware ethernet ${TARGET_SERVER_MAC}; # MAC address of the NIC to boot from on the target server
             fixed-address ${TARGET_SERVER_IP};       # IP address for the target server to use
             next-server ${PXE_SERVER_IP};           # IP address of the PXE server
-            filename "/grubnetx64.efi.signed";
+            filename "/bootx64.efi";
         }
     }
 }

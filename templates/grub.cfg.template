@@ -4,7 +4,18 @@ insmod efi_uga
 
 regexp --set 1:m1 --set 2:m2 --set 3:m3 --set 4:m4 --set 5:m5 --set 6:m6 '(\w{2}):(\w{2}):(\w{2}):(\w{2}):(\w{2}):(\w{2})' ${net_default_mac}
 mac_dashes="${m1}-${m2}-${m3}-${m4}-${m5}-${m6}"
+
 eval "set server_ip=\${net_${net_default_interface}_next_server}"
+if [ -z "$server_ip" ]; then
+    server_ip="${pxe_default_server}"
+fi
+if [ -z "$server_ip" ]; then
+    server_ip="${net_default_server}"
+fi
+if [ -z "$server_ip" ]; then
+    regexp --set 1:server_ip ',([0-9.]+)$' ${root}
+fi
+
 set ds_url="http://${server_ip}/${mac_dashes}"
 set iso_url="http://${server_ip}/${mac_dashes}/install.iso"
 

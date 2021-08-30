@@ -3,6 +3,9 @@ All in one DHCP/TFTP/HTTP server container for installing linux over the network
 
 Note that the container will run on macOS/Windows, but will not serve DHCP correctly (due to the way docker works on those platforms plus some assumptions in dhcpd). These instructions are written to be used on linux.
 
+Docker Hub - https://hub.docker.com/r/cseelye/pxe-server  
+Github - https://github.com/cseelye/pxe-server
+
 ## Usage
 There are two ways to use this container - automated or manual setup. The automated method is quick and easy but makes some assumptions and may need modification for your environment. The manual setup requires additional setup and per-server configuration but allows more flexibility.
 
@@ -29,7 +32,7 @@ export TARGET_SERVER_MAC=01:02:03:aa:bb:cc
 TARGET_PW_HASH='\$6\$lkLartS6w73V9oIY\$Jj4UouHhPh8EyERJH8tB5WQ4cjbGjbmFQ6kHnxxnhQN4L0DMrJ3WrFHA8LSXAzd016J175BRwIUgwWQLbucFm.'
 TARGET_USERNAME=user
 EOF
-docker container run --rm -it --net=host --privileged --name=pxe-server -v $(pwd)/pxe-data:/data --env-file pxe-env pxe-server
+docker container run --rm -it --net=host --privileged --name=pxe-server -v $(pwd)/pxe-data:/data --env-file pxe-env cseelye/pxe-server
 ```
 
 ### Manual Setup
@@ -63,5 +66,5 @@ docker container run --rm -it --net=host --name=pxe-server -v $(pwd)/pxe-data:/d
 ```
 
 # References
-Ubuntu installer - https://ubuntu.com/server/docs/install/autoinstall-reference
+Ubuntu installer - https://ubuntu.com/server/docs/install/autoinstall-reference  
 Grub network booting - https://www.gnu.org/software/grub/manual/grub/html_node/Network.html

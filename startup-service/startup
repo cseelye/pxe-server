@@ -94,4 +94,11 @@ cat /templates/nginx.conf.template | envsubst '${HTTP_DIR}' > /etc/nginx/nginx.c
 
 echo "Starting services"
 supervisorctl start all
+sleep 2
+echo
+echo "======================================================================="
+supervisorctl status all
+echo
 echo "Finished startup"
+echo "======================================================================="
+echo

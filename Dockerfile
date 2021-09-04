@@ -1,6 +1,9 @@
 FROM ubuntu:20.04 as base
 
 FROM base as builder
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install/build python packages
 RUN apt-get update && apt-get install --yes \
         python3 \
         python3-pip
@@ -9,44 +12,50 @@ RUN pip3 --no-cache-dir --disable-pip-version-check install --upgrade pip && \
     pip3 --no-cache-dir --disable-pip-version-check install --no-compile --force-reinstall --prefix /install \
     --requirement /tmp/requirements*.txt
 
+# Get the files we need for grub to use as a bootloader when PXE booting
+RUN apt-get update && \
+    apt-get install --yes --no-install-recommends grub-efi-amd64-signed grub-efi shim-signed && \
+    mkdir /grubfiles && \
+    cp /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed /grubfiles/grubx64.efi && \
+    cp -r usr/lib/grub/x86_64-efi /grubfiles/ && \
+    cp /usr/lib/shim/shimx64.efi.signed /grubfiles/bootx64.efi
+
 FROM base as final
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install --yes \
         curl \
-        dhcpdump \
-        dhcping \
         gettext-base \
         isc-dhcp-server \
-        monitoring-plugins-basic \
         net-tools \
         nginx \
-        nmap \
         python3 \
         rsync \
         rsyslog \
-        tftp \
         tftpd-hpa \
-        vim \
         webhook \
     && \
     apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Get the files we need for grub to use as a bootloader when PXE booting
-RUN apt-get update && \
-    apt-get install --yes --no-install-recommends grub-efi-amd64-signed grub-efi shim-signed && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir /grubfiles && \
-    cp /usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed /grubfiles/grubx64.efi && \
-    cp -r usr/lib/grub/x86_64-efi /grubfiles/ && \
-    cp /usr/lib/shim/shimx64.efi.signed /grubfiles/bootx64.efi && \
-    apt-get purge --yes --allow-remove-essential grub-efi-amd64-signed grub-efi shim-signed && \
-    apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Optional troubleshooting tools/scripts
+#RUN apt-get update && \
+#    apt-get install --yes \
+#        dhcpdump \
+#        dhcping \
+#        monitoring-plugins-basic \
+#        nmap \
+#        tftp \
+#        vim \
+#    && \
+#    apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
+#COPY scripts /scripts
+
+# Copy the bootloader files from the builder image
+COPY --from=builder /grubfiles /
 
 # Copy in the python packages from the builder image
 COPY --from=builder /install /usr/local/
-# Hack for dist-packages vs site-packages
+# Fix debian silliness of dist-packages vs site-packages
 RUN cd /usr/local/lib/python* && rm -r dist-packages && ln -fs site-packages dist-packages
 
 # rsyslog service
@@ -59,9 +68,6 @@ COPY rsync/rsync-service.conf /etc/supervisor/conf.d/rsync-service.conf
 
 # Other services
 COPY services/*.conf /etc/supervisor/conf.d/
-
-# Add the troubleshooting scripts
-COPY scripts /scripts
 
 # supervisor configuration
 COPY supervisord.conf /etc/supervisor/supervisord.conf

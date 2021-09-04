@@ -1,3 +1,2 @@
 supervisor
-supervisord-dependent-startup
 setuptools

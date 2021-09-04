@@ -86,6 +86,7 @@ if [[ -n "${PXE_SERVER_IP}" && -n "${NETWORK}" && -n "${NETMASK}" && \
       -n "${TARGET_SERVER_MAC}" && -n "${TARGET_SERVER_IP}" ]]; then
     echo "Updating dhcp config"
     cat /templates/dhcpd.conf.template | envsubst > "${DHCP_DIR}/dhcpd.conf"
+    cat /templates/reservations.conf.template | envsubst > "${DHCP_DIR}/reservations.conf"
     touch "${DHCP_DIR}/dhcpd.leases"
 fi
 

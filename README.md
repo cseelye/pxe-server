@@ -42,25 +42,23 @@ $ tree pxe-server
 pxe-data
 ├── dhcp
 │   ├── dhcpd.conf
-├── http
-│   ├── 00-0c-29-e8-5f-67
-│   │   ├── install.iso -> ../ubuntu-20.04.2-live-server-amd64.iso
-│   │   ├── meta-data
-│   │   ├── user-data
-│   │   └── vendor-data
-│   └── ubuntu-20.04.2-live-server-amd64.iso
-└── tftp
-    ├── 00-0c-29-e8-5f-67
+└── share
+    ├── 00-0c-29-e8-5f-67
     │   ├── initrd -> ../initrd-ubuntu-20.04.2-live-server-amd64.iso
+    │   ├── install.iso -> ../ubuntu-20.04.2-live-server-amd64.iso
+    │   ├── meta-data
+    │   ├── user-data
+    │   ├── vendor-data
     │   └── vmlinuz -> ../vmlinuz-ubuntu-20.04.2-live-server-amd64.iso
     ├── grub
-    │   ├── grub.cfg
-    ├── bootx64.efi
-    ├── grubx64.efi
+    │   └── grub.cfg
     ├── initrd-ubuntu-20.04.2-live-server-amd64.iso
+    ├── ubuntu-20.04.2-live-server-amd64.iso
     └── vmlinuz-ubuntu-20.04.2-live-server-amd64.iso
 ```
-See the startup script for how this is created. When the files are prepared, run the container:
+Under the share directory, there must be a subdirectory for each MAC address. In that directory must be a kernel/initrd, an ISO, and the cloud-init files for the install.
+
+See the startup script for more details. When the files are prepared, run the container:
 ```
 docker container run --rm -it --net=host --name=pxe-server -v $(pwd)/pxe-data:/data pxe-server
 ```

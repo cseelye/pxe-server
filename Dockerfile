@@ -32,6 +32,7 @@ RUN apt-get update && \
         python3 \
         rsync \
         rsyslog \
+        samba \
         tftpd-hpa \
         webhook \
     && \
@@ -82,6 +83,10 @@ COPY templates /templates
 COPY status-service/status-service.conf /etc/supervisor/conf.d/status-service.conf
 COPY status-service/status-event /status-service/status-event
 COPY status-service/status-hook.yaml /status-service/status-hook.yaml
+
+# Samba service
+COPY samba/samba-service.conf /etc/supervisor/conf.d/samba-service.conf
+COPY samba/smb.conf /etc/samba/smb.conf
 
 # dhcp config, tftp and http content are expected to be in this volume mount
 VOLUME /data

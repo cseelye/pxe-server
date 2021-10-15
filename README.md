@@ -56,7 +56,10 @@ pxe-data
     ├── ubuntu-20.04.2-live-server-amd64.iso
     └── vmlinuz-ubuntu-20.04.2-live-server-amd64.iso
 ```
-Under the share directory, there must be a subdirectory for each MAC address. In that directory must be a kernel/initrd, an ISO, and the cloud-init files for the install.
+The `dhcp` directory is used by the dhcp service and holds the dhcp config file. This is also where the leases file will be written.
+
+The `share` directory holds everything else and it will be shared out by the container using tftp, http, and SMB protocols. The container will put the grub boot files into place in this directory and expects you to supply a grub.cfg in one of the standard grub locations.  
+The other contents of the `share` directory will vary with your bootloader and distro. In the example above, I have put the Ubuntu 20.04 server iso in `share` and extracted the vmlinuz and initrd from that ISO and stored them in `share` as well. My grub.cfg (and the one created by the automated setup) expects a subdirectory for each client MAC address you will be booting. That directory contains whatever is needed to boot that client. In this example you can see I have symlinked the initrd, kernel, and ISO from the `share` directory, and added cloud-init files to automate the Ubuntu install. In this manner you can boot multiple clients with different configurations but reuse the same ISO. You could also add other ISO/install scripts for different clients.
 
 See the startup script for more details. When the files are prepared, run the container:
 ```

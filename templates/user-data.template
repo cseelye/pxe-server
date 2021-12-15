@@ -12,6 +12,10 @@ autoinstall:
   - "rsync -av /var/crash/* rsync://${PXE_SERVER_IP}:/crash/"
   identity: {hostname: ${TARGET_SERVER_NAME}, password: ${TARGET_PW_HASH}, realname: ${TARGET_USERNAME}, username: ${TARGET_USERNAME}}
   keyboard: {layout: us, toggle: null, variant: ''}
+  late-commands:
+    - "growpart /dev/sda 2"
+    - "resize2fs /dev/sda2"
+    - "poweroff"
   locale: en_US
   network:
     ethernets:
@@ -39,7 +43,7 @@ autoinstall:
     - {device: disk-sda, size: 536870912, wipe: superblock, flag: boot, number: 1,
       preserve: false, grub_device: true, type: partition, id: partition-0}
     - {fstype: fat32, volume: partition-0, preserve: false, type: format, id: format-0}
-    - {device: disk-sda, size: 19327352832, wipe: superblock, flag: '', number: 2,
+    - {device: disk-sda, size: 4294967296, wipe: superblock, flag: '', number: 2,
       preserve: false, grub_device: false, type: partition, id: partition-1}
     - {fstype: ext4, volume: partition-1, preserve: false, type: format, id: format-1}
     - {device: format-0, path: /boot/efi, type: mount, id: mount-0}

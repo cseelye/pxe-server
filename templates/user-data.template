@@ -9,13 +9,15 @@ autoinstall:
     - arches: [default]
       uri: http://ports.ubuntu.com/ubuntu-ports
   error-commands:
-  - "rsync -av /var/crash/* rsync://${PXE_SERVER_IP}:/crash/"
+  - "rsync /dev/null rsync://${PXE_SERVER_IP}:/crash/${TARGET_SERVER_NAME}/"
+  - "rsync -aLv /var/crash/* rsync://${PXE_SERVER_IP}:/crash/${TARGET_SERVER_NAME}/"
+  - "rsync -aLv /var/install* rsync://${PXE_SERVER_IP}:/crash/${TARGET_SERVER_NAME}/"
   identity: {hostname: ${TARGET_SERVER_NAME}, password: ${TARGET_PW_HASH}, realname: ${TARGET_USERNAME}, username: ${TARGET_USERNAME}}
   keyboard: {layout: us, toggle: null, variant: ''}
   late-commands:
-    - "growpart /dev/sda 2"
-    - "resize2fs /dev/sda2"
-    - "poweroff"
+  - "growpart /dev/sda 2"
+  - "resize2fs /dev/sda2"
+  - "poweroff"
   locale: en_US
   network:
     ethernets:

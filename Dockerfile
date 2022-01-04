@@ -25,15 +25,14 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install --yes \
         curl \
+        dnsmasq \
         gettext-base \
-        isc-dhcp-server \
         net-tools \
         nginx \
         python3 \
         rsync \
         rsyslog \
         samba \
-        tftpd-hpa \
         webhook \
     && \
     apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -52,7 +51,7 @@ RUN apt-get update && \
 #COPY scripts /scripts
 
 # Copy the bootloader files from the builder image
-COPY --from=builder /grubfiles /
+COPY --from=builder /grubfiles /grubfiles
 
 # Copy in the python packages from the builder image
 COPY --from=builder /install /usr/local/
@@ -87,6 +86,11 @@ COPY status-service/status-hook.yaml /status-service/status-hook.yaml
 # Samba service
 COPY samba/samba-service.conf /etc/supervisor/conf.d/samba-service.conf
 COPY samba/smb.conf /etc/samba/smb.conf
+
+# dnsmasq service (DHCP/TFTP)
+COPY dnsmasq/dhcp-service.conf /etc/supervisor/conf.d/dhcp-service.conf
+COPY dnsmasq/dnsmasq.conf /etc/dnsmasq.conf
+COPY dnsmasq/run-dnsmasq /usr/local/bin/run-dnsmasq
 
 # dhcp config, tftp and http content are expected to be in this volume mount
 VOLUME /data

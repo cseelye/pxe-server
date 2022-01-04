@@ -1,4 +1,0 @@
-    host ${TARGET_SERVER_NAME} {                # Name of the target server
-        hardware ethernet ${TARGET_SERVER_MAC}; # MAC address of the NIC to boot from on the target server
-        fixed-address ${TARGET_SERVER_IP};       # IP address for the target server to use
-    }

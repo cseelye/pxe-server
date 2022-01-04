@@ -19,9 +19,9 @@ http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
-    log_format simple_fmt 'remote=$remote_addr req="$request" status=$status bytes=$body_bytes_sent';
+    log_format simple_fmt 'remote=$remote_addr req="$request" status=$status bytes=$body_bytes_sent request_time=$request_time';
     access_log syslog:server=unix:/dev/log,tag=nginx,nohostname,severity=debug simple_fmt;
-    error_log syslog:server=unix:/dev/log,tag=nginx,nohostname,severity=error;
+    error_log syslog:server=unix:/dev/log,tag=nginx,nohostname,severity=debug;
 
     server {
         listen 80 default_server;

@@ -13,7 +13,6 @@ export PXE_SERVER_IP=${PXE_SERVER_IP:-}
 export ISO_URL=${ISO_URL:-}
 export ISO_FILE=${ISO_FILE:-}
 export NETWORK=${NETWORK:-}
-export NETMASK=${NETMASK:-}
 export CIDR=${CIDR:-}
 export ROUTER_IP=${ROUTER_IP:-}
 export DNS_IP=${DNS_IP:-}
@@ -25,5 +24,12 @@ export TARGET_PW_HASH=${TARGET_PW_HASH:-}
 export TARGET_USERNAME=${TARGET_USERNAME:-}
 export IFACE=${IFACE:-}
 
+export DEBUG=${DEBUG:-}
+DEBUG_ARGS=""
+if [[ -n ${DEBUG} ]]; then
+    #DEBUG_ARGS="--loglevel DEBUG"
+    set -x
+fi
+
 # Start supervisord
-exec /usr/local/bin/supervisord -c /etc/supervisor/supervisord.conf
+exec /usr/local/bin/supervisord -c /etc/supervisor/supervisord.conf ${DEBUG_ARGS}

@@ -11,6 +11,10 @@ done
 exec 1> >(logger -t startup)
 exec 2>&1
 
+if [[ -n ${DEBUG:-} ]]; then
+    set -x
+fi
+
 mkdir -p "${DHCP_DIR}" "${DHCP_DIR}"/hosts "${TFTP_DIR}" "${HTTP_DIR}" "${CRASH_DIR}"
 
 # Install grub if needed
@@ -62,6 +66,7 @@ fi
 
 # Create subdir for this server
 target_conf_dir_tftp=""
+target_conf_dir_http=""
 if [[ -n "${TARGET_SERVER_MAC}" ]]; then
     target_server_mac_dashes="$( echo "${TARGET_SERVER_MAC}" | tr ':' '-')"
     target_conf_dir_http="${HTTP_DIR}/${target_server_mac_dashes}"
@@ -103,6 +108,7 @@ if [[ -n "${TARGET_SERVER_NAME}" && -n "${TARGET_SERVER_MAC}" && -n "${TARGET_SE
     cat /templates/dnsmasq-hosts.conf.template | envsubst > "${DHCP_DIR}/hosts/${TARGET_SERVER_NAME}.conf"
 fi
 
+set +x
 echo "Starting services"
 supervisorctl start all
 sleep 2

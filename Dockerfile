@@ -86,6 +86,7 @@ COPY status-service/status-hook.yaml /status-service/status-hook.yaml
 # Samba service
 COPY samba/samba-service.conf /etc/supervisor/conf.d/samba-service.conf
 COPY samba/smb.conf /etc/samba/smb.conf
+COPY samba/run-samba /usr/local/bin/run-samba
 
 # dnsmasq service (DHCP/TFTP)
 COPY dnsmasq/dhcp-service.conf /etc/supervisor/conf.d/dhcp-service.conf

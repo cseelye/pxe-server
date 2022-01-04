@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+DEBUG_ARGS=""
+if [[ -n ${DEBUG:-} ]]; then
+    DEBUG_ARGS="--debuglevel=3"
+    set -x
+fi
+
+exec /usr/sbin/smbd --foreground --no-process-group ${DEBUG_ARGS}

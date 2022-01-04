@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+DEBUG_ARGS=""
+if [[ -n ${DEBUG:-} ]]; then
+    DEBUG_ARGS="--log-dhcp"
+    set -x
+fi
+
+BIND_INTERFACE=""
+if [[ -n ${IFACE} ]]; then
+    BIND_INTERFACE="--interface=${IFACE}"
+fi
+
+exec /usr/sbin/dnsmasq --keep-in-foreground --port=0 --conf-file=/etc/dnsmasq.conf --conf-dir=/data/dhcp,*.conf --dhcp-hostsdir=/data/dhcp/hosts/ ${BIND_INTERFACE} ${DEBUG_ARGS}

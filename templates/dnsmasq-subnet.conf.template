@@ -1,0 +1,3 @@
+dhcp-range=${NETWORK},static    # Network for this subnet
+dhcp-option=3,${ROUTER_IP}      # Router/default gateway IP
+dhcp-option=6,${DNS_IP}         # DNS server IP

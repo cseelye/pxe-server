@@ -1,10 +1,14 @@
 # pxe-server
 All in one DHCP/TFTP/HTTP server container for installing linux over the network via PXE booting. This is written to automate installing Ubuntu 20.04 server, but can install other distros with some tweaks.
 
-Note that the container will run on macOS/Windows, but will not serve DHCP correctly (due to the way docker works on those platforms plus some assumptions in dhcpd). These instructions are written to be used on linux.
+Note that the container will run on macOS/Windows, but will not serve DHCP correctly (due to the way docker networking works on those platforms). These instructions are written to be used on linux.
 
-Docker Hub - https://hub.docker.com/r/cseelye/pxe-server  
-Github - https://github.com/cseelye/pxe-server
+Get the container image:
+```shell
+docker pull ghcr.io/cseelye/pxe-server    # Pull from Github Container Registry  
+docker pull cseelye/pxe-server            # Pull from Docker Hub  
+```
+Pre-built containers are tagged by the day they were built, with :latest always pointing the the most recent build. Click the Packages link to see the list of tags.
 
 ## Usage
 For convenience, there is a startup script that will interpret a series of envrionment variables and create the config/boot files for you. This automated method is quick and easy but makes some assumptions and may need modification for your environment. You can also create everything manually if you wish, or create it with the startup script and then tweak it to your needs.
@@ -86,5 +90,5 @@ docker container run --rm -it --net=host --privileged --name=pxe-server -v $(pwd
 
 # References
 Ubuntu installer - https://ubuntu.com/server/docs/install/autoinstall-reference  
-dnsmasq config - http://manpages.ubuntu.com/manpages/focal/man8/dnsmasq.8.html
+dnsmasq config - http://manpages.ubuntu.com/manpages/focal/man8/dnsmasq.8.html  
 Grub network booting - https://www.gnu.org/software/grub/manual/grub/html_node/Network.html

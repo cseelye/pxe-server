@@ -33,7 +33,6 @@ RUN apt-get update && \
         rsync \
         rsyslog \
         samba \
-        webhook \
     && \
     apt-get autoremove --yes && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -80,8 +79,7 @@ COPY templates /templates
 
 # Installer progress webhook
 COPY status-service/status-service.conf /etc/supervisor/conf.d/status-service.conf
-COPY status-service/status-event /status-service/status-event
-COPY status-service/status-hook.yaml /status-service/status-hook.yaml
+COPY status-service/status.py /status/status.py
 
 # Samba service
 COPY samba/samba-service.conf /etc/supervisor/conf.d/samba-service.conf
